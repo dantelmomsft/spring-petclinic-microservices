@@ -15,7 +15,8 @@ env:
   AZURE_LOCATION: 'eastus'
 
   API_GATEWAY: api-gateway
-  API_GATEWAY_JAR: spring-petclinic-api-gateway/target/spring-petclinic-api-gateway-2.6.11.jar
+  API_GATEWAY_JAR_PATH: spring-petclinic-api-gateway/target
+  API_GATEWAY_JAR_NAME: spring-petclinic-api-gateway-2.6.11.jar
  
   AZURE_CRED: ${{ secrets.AZURE_CREDENTIALS }}
   AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
@@ -48,7 +49,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: jar-files
-          path: ${{ env.ASC_PACKAGE_PATH }}/${{ env.API_GATEWAY_JAR }} 
+          path: ${{ env.ASC_PACKAGE_PATH }}/${{ env.API_GATEWAY_JAR_PATH }}/${{ env.API_GATEWAY_JAR_NAME }}
 
       
   deploy:
@@ -74,7 +75,7 @@ jobs:
           service-name: ${{ env.SPRING_APPS_SERVICE }}
           app-name: ${{ env.API_GATEWAY }}
           use-staging-deployment: false
-          package: ${{ env.ASC_PACKAGE_PATH }}/${{ env.API_GATEWAY_JAR }}
+          package: ${{ env.ASC_PACKAGE_PATH }}/${{ env.API_GATEWAY_JAR_NAME }}
           jvm-options: -Dspring.profiles.active=mysql
 
           # Log out from Azure
