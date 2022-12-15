@@ -75,8 +75,16 @@ jobs:
           service-name: ${{ env.SPRING_APPS_SERVICE }}
           app-name: ${{ env.API_GATEWAY }}
           use-staging-deployment: true
+          create-new-deployment: true
           package: ${{ env.ASC_PACKAGE_PATH }}/${{ env.API_GATEWAY_JAR_NAME }}
           jvm-options: -Dspring.profiles.active=mysql
+      - name: Log out from Azure
+        id: azure_logout
+        uses: azure/cli@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az logout
    
   switch-active:
     runs-on: ubuntu-latest
@@ -88,7 +96,12 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            echo "I shoulf execute some smoke test against staging before automatically promote it as production"
+            echo "I should execute some smoke test against staging before automatically promote it as production"
+
+      - name: Login via Azure CLI
+        uses: azure/login@v1.1
+        with:
+          creds: ${{ env.AZURE_CRED }}
 
       - name: switch active deployment
         uses: azure/spring-apps-deploy@v1
