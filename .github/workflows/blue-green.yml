@@ -74,7 +74,7 @@ jobs:
           action: Deploy
           service-name: ${{ env.SPRING_APPS_SERVICE }}
           app-name: ${{ env.API_GATEWAY }}
-          use-staging-deployment: true
+          use-staging-deployment: false
           package: ${{ env.ASC_PACKAGE_PATH }}/${{ env.API_GATEWAY_JAR_NAME }}
           jvm-options: -Dspring.profiles.active=mysql
    
@@ -97,7 +97,7 @@ jobs:
           action: set-production
           service-name: ${{ env.SPRING_APPS_SERVICE }}
           app-name: ${{ env.API_GATEWAY }}
-          use-staging-deployment: false
+          use-staging-deployment: true
      
       - name: delete staging deployment
         uses: azure/spring-apps-deploy@v1
