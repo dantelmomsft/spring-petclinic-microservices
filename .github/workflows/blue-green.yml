@@ -52,7 +52,7 @@ jobs:
           path: ${{ env.ASC_PACKAGE_PATH }}/${{ env.API_GATEWAY_JAR_PATH }}/${{ env.API_GATEWAY_JAR_NAME }}
 
       
-  deploy:
+  deploy-staging:
     runs-on: ubuntu-latest
     needs: build
    
@@ -67,16 +67,45 @@ jobs:
         with:
           creds: ${{ env.AZURE_CRED }}
 
-      - name: deploy to production with artifact, api-gateway
+      - name: deploy to staging 
         uses: azure/spring-apps-deploy@v1
         with:
           azure-subscription: ${{ env.AZURE_SUBSCRIPTION_ID }}
           action: Deploy
           service-name: ${{ env.SPRING_APPS_SERVICE }}
           app-name: ${{ env.API_GATEWAY }}
-          use-staging-deployment: false
+          use-staging-deployment: true
           package: ${{ env.ASC_PACKAGE_PATH }}/${{ env.API_GATEWAY_JAR_NAME }}
           jvm-options: -Dspring.profiles.active=mysql
+   
+  switch-active:
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+   
+    steps:
+      - name: smoke test staging deployment
+        uses: azure/CLI@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            echo "I shoulf execute some smoke test against staging before automatically promote it as production"
+
+      - name: switch active deployment
+        uses: azure/spring-apps-deploy@v1
+        with:
+          azure-subscription: ${{ env.AZURE_SUBSCRIPTION_ID }}
+          action: set-production
+          service-name: ${{ env.SPRING_APPS_SERVICE }}
+          app-name: ${{ env.API_GATEWAY }}
+          use-staging-deployment: true
+     
+      - name: delete staging deployment
+        uses: azure/spring-apps-deploy@v1
+        with:
+          azure-subscription: ${{ env.AZURE_SUBSCRIPTION_ID }}
+          action: delete-staging-deployment
+          service-name: ${{ env.SPRING_APPS_SERVICE }}
+          app-name: ${{ env.API_GATEWAY }}
 
           # Log out from Azure
       - name: Log out from Azure
