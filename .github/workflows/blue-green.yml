@@ -91,17 +91,17 @@ jobs:
     needs: deploy-staging
    
     steps:
+      - name: Login via Azure CLI
+        uses: azure/login@v1.1
+        with:
+          creds: ${{ env.AZURE_CRED }}
+
       - name: smoke test staging deployment
         uses: azure/CLI@v1
         with:
           azcliversion: latest
           inlineScript: |
             echo "I should execute some smoke test against staging before automatically promote it as production"
-
-      - name: Login via Azure CLI
-        uses: azure/login@v1.1
-        with:
-          creds: ${{ env.AZURE_CRED }}
 
       - name: switch active deployment
         uses: azure/spring-apps-deploy@v1
