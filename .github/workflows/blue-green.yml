@@ -47,7 +47,8 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: jar-files    
+          name: jar-files
+          path: ${{ env.ASC_PACKAGE_PATH }}/${{ env.API_GATEWAY_JAR }} 
 
       
   deploy:
