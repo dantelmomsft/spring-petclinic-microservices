@@ -86,7 +86,7 @@ jobs:
             fi
             echo 'new deployment: ' $NEWDEPLOYMENT
             echo 'active deployment': $ACTIVEDEPLOYMENT
-            NEWDEPLOYMENTEXISTS=$(az spring app deployment list --app ${{env.APP_NAME}} ${{env.APP_NAME}} -s ${{ env.SPRING_APPS_SERVICE }}  -g ${{ env.AZURE_RESOURCE_GROUP_NAME }} --query "[?name=='$NEWDEPLOYMENT'].name" -o tsv)
+            NEWDEPLOYMENTEXISTS=$(az spring app deployment list --app ${{env.APP_NAME}} -s ${{ env.SPRING_APPS_SERVICE }}  -g ${{ env.AZURE_RESOURCE_GROUP_NAME }} --query "[?name=='$NEWDEPLOYMENT'].name" -o tsv)
             if [ "$NEWDEPLOYMENTEXISTS" = "$NEWDEPLOYMENT" ]; then
               echo $NEWDEPLOYMENT ' already exists'
             else
