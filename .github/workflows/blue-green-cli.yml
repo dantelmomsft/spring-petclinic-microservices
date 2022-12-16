@@ -19,7 +19,7 @@ env:
   APP_JAR_NAME: spring-petclinic-api-gateway-2.6.11.jar
  
   DEFAULT_DEPLOYMENT: default
-  NEW_DEPLOYMENT: green
+  NEW_DEPLOYMENT: staging
   ENVIRONMENT: Production
 
   AZURE_CRED: ${{ secrets.AZURE_CREDENTIALS }}
