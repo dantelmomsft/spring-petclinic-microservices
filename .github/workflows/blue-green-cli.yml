@@ -50,7 +50,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: jar-files
-          path: ${{ env.ASC_PACKAGE_PATH }}/${{ env.API_NAME_JAR_PATH }}/${{ env.API_JAR_NAME }}
+          path: ${{ env.ASC_PACKAGE_PATH }}/${{ env.APP_NAME_JAR_PATH }}/${{ env.APP_JAR_NAME }}
 
       
   deploy-staging:
