@@ -11,7 +11,7 @@ env:
   ASC_PACKAGE_PATH: ${{ github.workspace }}
   
   AZURE_RESOURCE_GROUP_NAME: 'asa_springlabs_rg'
-  SPRING_APPS_SERVICE: springappssvc5e4b10
+  SPRING_APPS_SERVICE: 'springappssvc5e4b10'
   AZURE_LOCATION: 'eastus'
 
   APP_NAME: api-gateway
@@ -78,9 +78,7 @@ jobs:
           azcliversion: latest
           inlineScript: |
             az extension add --name spring
-            az config set defaults.group = ${{ env.AZURE_RESOURCE_GROUP_NAME }}
-            az config set defaults.spring = ${{ env.SPRING_APPS_SERVICE }}
-            ACTIVEDEPLOYMENT=$(az spring app show -n ${{env.APP_NAME}} --query properties.activeDeployment.name -o tsv)
+            ACTIVEDEPLOYMENT=$(az spring app show -n ${{env.APP_NAME}} -s ${{ env.SPRING_APPS_SERVICE }}  -g ${{ env.AZURE_RESOURCE_GROUP_NAME }} --query properties.activeDeployment.name -o tsv)
             if [ "$ACTIVEDEPLOYMENT" = "${{env.DEFAULT_DEPLOYMENT}}" ]; then
               NEWDEPLOYMENT="${{env.NEW_DEPLOYMENT}}"
             else
@@ -88,14 +86,14 @@ jobs:
             fi
             echo 'new deployment: ' $NEWDEPLOYMENT
             echo 'active deployment': $ACTIVEDEPLOYMENT
-            NEWDEPLOYMENTEXISTS=$(az spring app deployment list --app ${{env.APP_NAME}} --query "[?name=='$NEWDEPLOYMENT'].name" -o tsv)
+            NEWDEPLOYMENTEXISTS=$(az spring app deployment list --app ${{env.APP_NAME}} ${{env.APP_NAME}} -s ${{ env.SPRING_APPS_SERVICE }}  -g ${{ env.AZURE_RESOURCE_GROUP_NAME }} --query "[?name=='$NEWDEPLOYMENT'].name" -o tsv)
             if [ "$NEWDEPLOYMENTEXISTS" = "$NEWDEPLOYMENT" ]; then
               echo $NEWDEPLOYMENT ' already exists'
             else
               echo 'creating deployment ' $NEWDEPLOYMENT
-              az spring app deployment create --app ${{inputs.APP_NAME}} -n $NEWDEPLOYMENT
+              az spring app deployment create --app ${{env.APP_NAME}} -n $NEWDEPLOYMENT -s ${{ env.SPRING_APPS_SERVICE }}  -g ${{ env.AZURE_RESOURCE_GROUP_NAME }}
             fi
-            az spring app deploy -n ${{env.APP_NAME}} --jar-path ${{ env.ASC_PACKAGE_PATH }}/${{ env.APP_JAR_NAME }} -d $NEWDEPLOYMENT
+            az spring app deploy -n ${{env.APP_NAME}} -s ${{ env.SPRING_APPS_SERVICE }}  -g ${{ env.AZURE_RESOURCE_GROUP_NAME }} --jar-path ${{ env.ASC_PACKAGE_PATH }}/${{ env.APP_JAR_NAME }} -d $NEWDEPLOYMENT
       - name: Log out from Azure
         id: azure_logout
         uses: azure/cli@v1
@@ -128,10 +126,8 @@ jobs:
           azcliversion: latest
           inlineScript: |
             az extension add --name spring
-            az config set defaults.group = ${{ env.AZURE_RESOURCE_GROUP_NAME }}
-            az config set defaults.spring = ${{ env.SPRING_APPS_SERVICE }}
-            az spring app set-deployment -d ${{ needs.deploy-staging.outputs.NEWDEPLOYMENT }} -n ${{env.APP_NAME}}
-            az spring app deployment delete --app ${{env.APP_NAME}} -n ${{ needs.deploy-staging.outputs.ACTIVEDEPLOYMENT }}
+            az spring app set-deployment -d ${{ needs.deploy-staging.outputs.NEWDEPLOYMENT }} -n ${{env.APP_NAME}} -s ${{ env.SPRING_APPS_SERVICE }}  -g ${{ env.AZURE_RESOURCE_GROUP_NAME }}
+            az spring app deployment delete --app ${{env.APP_NAME}} -n ${{ needs.deploy-staging.outputs.ACTIVEDEPLOYMENT }} -s ${{ env.SPRING_APPS_SERVICE }}  -g ${{ env.AZURE_RESOURCE_GROUP_NAME }}
             # Log out from Azure
 
       - name: Log out from Azure
