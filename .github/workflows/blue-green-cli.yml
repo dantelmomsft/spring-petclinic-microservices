@@ -94,6 +94,8 @@ jobs:
               az spring app deployment create --app ${{env.APP_NAME}} -n $NEWDEPLOYMENT -s ${{ env.SPRING_APPS_SERVICE }}  -g ${{ env.AZURE_RESOURCE_GROUP_NAME }}
             fi
             az spring app deploy -n ${{env.APP_NAME}} -s ${{ env.SPRING_APPS_SERVICE }}  -g ${{ env.AZURE_RESOURCE_GROUP_NAME }} --artifact-path ${{ env.ASC_PACKAGE_PATH }}/${{ env.APP_JAR_NAME }} -d $NEWDEPLOYMENT
+            echo "NEWDEPLOYMENT=$NEWDEPLOYMENT" >> $GITHUB_OUTPUT
+            echo "ACTIVEDEPLOYMENT=$ACTIVEDEPLOYMENT" >> $GITHUB_OUTPUT
       - name: Log out from Azure
         id: azure_logout
         uses: azure/cli@v1
