@@ -79,9 +79,9 @@ jobs:
           action: Deploy
           service-name: ${{ env.SPRING_APPS_SERVICE }}
           app-name: ${{ env.API_GATEWAY }}
-          use-staging-deployment: true
+          #use-staging-deployment: true
           deployment-name: ${{ inputs.name }} 
-          ##create-new-deployment: true
+          create-new-deployment: true
           package: ${{ env.ASC_PACKAGE_PATH }}/${{ env.API_GATEWAY_JAR_NAME }}
           jvm-options: -Dspring.profiles.active=mysql
       - name: Log out from Azure
