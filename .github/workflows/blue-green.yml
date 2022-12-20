@@ -6,22 +6,33 @@ name: CD, Build & deploy using github actions
 on:
   workflow_dispatch:
     inputs:
-     name:
+     deploymentName:
       description: 'Deployment name'
       required: false
       default: 'production'
       type: string
+     appName: 
+      description: 'Spring Apps app name'
+      required: true
+      default: 'api-gateway'
+      type: string
+     appJarFolderPath: 
+      description: 'Spring Apps app jar folder'
+      required: true
+      default: 'spring-petclinic-api-gateway/target'
+      type: string
+     appJarName: 
+      description: 'Spring Apps app jar folder'
+      required: true
+      default: 'spring-petclinic-api-gateway-2.6.11.jar'
+      type: string
+
+
 env:
   
-  ASC_PACKAGE_PATH: ${{ github.workspace }}
   
   AZURE_RESOURCE_GROUP_NAME: 'asa_springlabs_rg'
   SPRING_APPS_SERVICE: springappssvc5e4b10
-  AZURE_LOCATION: 'eastus'
-
-  API_GATEWAY: api-gateway
-  API_GATEWAY_JAR_PATH: spring-petclinic-api-gateway/target
-  API_GATEWAY_JAR_NAME: spring-petclinic-api-gateway-2.6.11.jar
  
   AZURE_CRED: ${{ secrets.AZURE_CREDENTIALS }}
   AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
@@ -54,7 +65,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: jar-files
-          path: ${{ env.ASC_PACKAGE_PATH }}/${{ env.API_GATEWAY_JAR_PATH }}/${{ env.API_GATEWAY_JAR_NAME }}
+          path: ${{ github.workspace }}/${{ inputs.appJarFolderPath }}/${{ inputs.appJarName }}
 
       
   deploy-staging:
@@ -78,11 +89,11 @@ jobs:
           azure-subscription: ${{ env.AZURE_SUBSCRIPTION_ID }}
           action: Deploy
           service-name: ${{ env.SPRING_APPS_SERVICE }}
-          app-name: ${{ env.API_GATEWAY }}
+          app-name: ${{ inputs.appName }} 
           #use-staging-deployment: true
           deployment-name: ${{ inputs.name }} 
           create-new-deployment: true
-          package: ${{ env.ASC_PACKAGE_PATH }}/${{ env.API_GATEWAY_JAR_NAME }}
+          package: ${{ github.workspace }}/${{ inputs.appJarName }}
           jvm-options: -Dspring.profiles.active=mysql
       - name: Log out from Azure
         id: azure_logout
@@ -115,7 +126,7 @@ jobs:
           azure-subscription: ${{ env.AZURE_SUBSCRIPTION_ID }}
           action: set-production
           service-name: ${{ env.SPRING_APPS_SERVICE }}
-          app-name: ${{ env.API_GATEWAY }}
+          app-name: ${{ inputs.appName }}
           use-staging-deployment: true
      
       - name: delete staging deployment
@@ -124,7 +135,7 @@ jobs:
           azure-subscription: ${{ env.AZURE_SUBSCRIPTION_ID }}
           action: delete-staging-deployment
           service-name: ${{ env.SPRING_APPS_SERVICE }}
-          app-name: ${{ env.API_GATEWAY }}
+          app-name: ${{ inputs.appName }}
 
           # Log out from Azure
       - name: Log out from Azure
