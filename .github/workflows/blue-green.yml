@@ -17,12 +17,12 @@ on:
       default: 'api-gateway'
       type: string
      appJarFolderPath: 
-      description: 'Spring Apps app jar folder'
+      description: ' jar folder'
       required: true
       default: 'spring-petclinic-api-gateway/target'
       type: string
      appJarName: 
-      description: 'Spring Apps app jar folder'
+      description: 'jar name'
       required: true
       default: 'spring-petclinic-api-gateway-2.6.11.jar'
       type: string
@@ -91,7 +91,7 @@ jobs:
           service-name: ${{ env.SPRING_APPS_SERVICE }}
           app-name: ${{ inputs.appName }} 
           #use-staging-deployment: true
-          deployment-name: ${{ inputs.name }} 
+          deployment-name: ${{ inputs.deploymentName }} 
           create-new-deployment: true
           package: ${{ github.workspace }}/${{ inputs.appJarName }}
           jvm-options: -Dspring.profiles.active=mysql
